@@ -1,4 +1,4 @@
-What I'm working on here is a project to grid photos or other images
+What I'm working on here is a tool to grid photos or other images
 prior to transfer to canvas or panel, similar to methods used by
 photorealists and other artists (example [[http://legionofhonor.famsf.org/blog/invisible-man-self-portrait-chuck-close][here]]).
 

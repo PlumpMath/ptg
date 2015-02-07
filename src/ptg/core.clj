@@ -1,13 +1,11 @@
-(ns mikera.image.demo
+(ns ptg.core
   (:require [mikera.image.core :as img]
             [seesaw.core :as see])
   (:import java.awt.image.BufferedImage))
 
 
-(set! *unchecked-math* true)
-
-
-(let [img (img/load-image (clojure.java.io/resource "img.jpg"))
+(let [filename "img.jpg"
+      img (img/load-image (clojure.java.io/resource filename))
       image-width (.getWidth img)
       image-height (.getHeight img)
       lines-across 10
@@ -25,5 +23,7 @@
   (doseq [y (map (partial * pixels-between-lines-down) (range lines-down))]
     (line-x y 0 image-width))
   ;(img/show img :zoom 0.5)
-  (let [f (see/frame :content (see/label :icon img))]
+  (let [f (see/frame :content (see/scrollable (see/label :icon img))
+                     :minimum-size [640 :by 480]
+                     :title filename)]
     (see/show! f)))
