@@ -8,22 +8,32 @@
       img (img/load-image (clojure.java.io/resource filename))
       image-width (.getWidth img)
       image-height (.getHeight img)
-      lines-across 10
-      lines-down 10
-      pixels-between-lines-across (/ image-width lines-across)
-      pixels-between-lines-down (/ image-height lines-down)
+      pixels-between-lines 80
+      lines-across (int (/ image-width pixels-between-lines))
+      lines-down (int (/ image-height pixels-between-lines))
       line-x (fn [y x0 x1]
                (doseq [x (range x0 x1)]
                  (.setRGB img x y 0)))
       line-y (fn [x y0 y1]
                (doseq [y (range y0 y1)]
                  (.setRGB img x y 0)))]
-  (doseq [x (map (partial * pixels-between-lines-across) (range lines-across))]
+  (doseq [x (map (partial * pixels-between-lines) (range lines-across))]
     (line-y x 0 image-height))
-  (doseq [y (map (partial * pixels-between-lines-down) (range lines-down))]
+  (doseq [y (map (partial * pixels-between-lines) (range lines-down))]
     (line-x y 0 image-width))
-  ;(img/show img :zoom 0.5)
-  (let [f (see/frame :content (see/scrollable (see/label :icon img))
+  (let [img-scroll (see/scrollable (see/label :icon img))
+        input-form (see/horizontal-panel
+                    :items [(see/label :text "Support size: ")
+                            (see/text :columns 1 :text "11")
+                            (see/label :text " inches wide by ")
+                            (see/text "8.5")
+                            (see/label :text " inches high. Square size: ")
+                            (see/text "1")
+                            (see/label :text " inch.")])
+        contents (see/vertical-panel :items [input-form
+                                             img-scroll])
+        f (see/frame :content contents
                      :minimum-size [640 :by 480]
                      :title filename)]
+    (see/pack! f)
     (see/show! f)))
