@@ -1,7 +1,11 @@
 (ns ptg.core
+  (:gen-class)
   (:require [mikera.image.core :as img]
             [seesaw.core :as see])
   (:import java.awt.image.BufferedImage))
+
+
+(see/native!)
 
 
 (defn- line-x [img y x0 x1]
@@ -84,7 +88,9 @@
                             (see/label :text " inches/cm wide by ")
                             (see/text (str support-height))
                             (see/label :text " inches/cm high. Square size: ")
-                            (see/text (str support-grid-spacing))
+                            (see/text :text (str support-grid-spacing)
+                                      :listen [:key-pressed
+                                               (fn [e] (println e))])
                             (see/label :text " inch/cm. ")])
         contents (see/vertical-panel :items [input-form
                                              img-scroll])
@@ -98,8 +104,5 @@
     (see/show! f)))
 
 
-(comment
-
-  (dogrid (clojure.java.io/resource "img.jpg"))
-
-)
+(defn -main []
+  (dogrid (clojure.java.io/resource "img.jpg")))
