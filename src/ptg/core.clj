@@ -5,19 +5,6 @@
   (:import java.awt.image.BufferedImage))
 
 
-(see/native!)
-
-
-(defn- line-x [img y x0 x1]
-  (doseq [x (range x0 x1)]
-    (.setRGB img x y 0)))
-
-
-(defn- line-y [img x y0 y1]
-  (doseq [y (range y0 y1)]
-    (.setRGB img x y 0)))
-
-
 (defn gridlines
   "
   Generate grid lines pattern for a given support (target area) given
@@ -69,40 +56,63 @@
        margin-side (+ margin-side pixels-horiz-on-support)])}))
 
 
-(defn dogrid [file-ob]
-  (let [img (img/load-image file-ob)
-        image-width (.getWidth img)
-        image-height (.getHeight img)
-        support-width 11
-        support-height 5
-        support-grid-spacing 1
-        {xlines :xlines, ylines :ylines} (gridlines
-                                           support-width
-                                           support-height
-                                           support-grid-spacing
-                                           image-width image-height)
-        img-scroll (see/scrollable (see/label :icon img))
-        input-form (see/horizontal-panel
-                    :items [(see/label :text " Support size: ")
-                            (see/text :text (str support-width))
-                            (see/label :text " inches/cm wide by ")
-                            (see/text (str support-height))
-                            (see/label :text " inches/cm high. Square size: ")
-                            (see/text :text (str support-grid-spacing)
-                                      :listen [:key-pressed
-                                               (fn [e] (println e))])
-                            (see/label :text " inch/cm. ")])
-        contents (see/vertical-panel :items [input-form
-                                             img-scroll])
-        f (see/frame :content contents
-                     :title (.getFile file-ob))]
-    (doseq [[x y0 y1] ylines]
-      (line-y img x y0 y1))
-    (doseq [[y x0 x1] xlines]
-      (line-x img y x0 x1))
+(def f (see/frame))
+(def support-width 11)
+(def support-height 5)
+(def support-grid-spacing 1)
+(see/config! f :title "hi")
+(see/config! f :content (see/text :text "da bazzr"))
+(def width-txt (see/text (str support-width)))
+(def height-txt (see/text (str support-height)))
+(def grid-txt (see/text (str support-grid-spacing)))
+
+
+(def lbl (see/label))
+
+
+(def input-form
+  (see/horizontal-panel
+   :items
+   [(see/label :text " Support size: ") width-txt
+    (see/label :text " inches/cm wide by ") height-txt
+    (see/label :text " inches/cm high. Square size: ") grid-txt
+    (see/label :text " inch/cm. ")]))
+
+
+(def img-scroll (see/scrollable lbl))
+
+
+(defn draw-image-with-lines [support-width
+                             support-height
+                             support-grid-spacing]
+  (let [img (->> "img.jpg"
+                 clojure.java.io/resource
+                 img/load-image)
+        {:keys [xlines ylines]}
+        (gridlines support-width support-height support-grid-spacing
+                   (.getWidth img) (.getHeight img))
+        contents (see/vertical-panel :items [input-form img-scroll])]
+    (doseq [[y x0 x1] xlines] (line-x img y x0 x1))
+    (doseq [[x y0 y1] ylines] (line-y img x y0 y1))
+    (see/config! f :content contents)
+    (see/config! lbl :icon img)
     (see/pack! f)
     (see/show! f)))
 
 
-(defn -main []
-  (dogrid (clojure.java.io/resource "img.jpg")))
+(defn callback [e]
+  (if (= 10 (.getKeyCode e))
+    (let [width (Integer. (see/config width-txt :text))
+          height (Integer. (see/config height-txt :text))
+          grid-size (Integer. (see/config grid-txt :text))]
+      (draw-image-with-lines width height grid-size))))
+
+
+(see/listen width-txt :key-pressed callback)
+(see/listen height-txt :key-pressed callback)
+(see/listen grid-txt :key-pressed callback)
+
+
+(see/native!)
+(draw-image-with-lines 12 10 3)
+
