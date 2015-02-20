@@ -8,9 +8,32 @@ and other artists (example [[http://legionofhonor.famsf.org/blog/invisible-man-s
 
 Uses [[https://github.com/daveray/seesaw][Seesaw]] and [[https://github.com/mikera/imagez][Imagez]].
 
-*** Example screen shot
+** Usage:
+
+#+BEGIN_EXAMPLE
+lein run <filename>
+#+END_EXAMPLE
+or
+#+BEGIN_EXAMPLE
+lein uberjar
+java -jar target/ptg-<version>-standalone.jar <filename>
+#+END_EXAMPLE
+
+Then, adjust size/grid settings as appropriate, take a screen shot,
+then crop (until I implement Save).
+
+** Example screen shot
 
 [[./img/screenshot.png]]
+
+
+** Work to do:
+
+- Implement XOR grid rather than black grid
+- Implement draggable grid
+- Implement Load/Save functionality
+- Implement drag and drop
+- Package into app
 
 License: MIT
 
