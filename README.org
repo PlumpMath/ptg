@@ -2,11 +2,11 @@
 
 * ptg
 
-A simple tool (in progress) to grid photos or other images prior to
-transfer to canvas or panel, similar to methods used by photorealists
-and other artists (example [[http://legionofhonor.famsf.org/blog/invisible-man-self-portrait-chuck-close][here]]).
+A simple tool to grid photos or other images prior to transfer to
+canvas or panel, similar to methods used by photorealists and other
+artists (example [[http://legionofhonor.famsf.org/blog/invisible-man-self-portrait-chuck-close][here]]).
 
-Uses [[https://github.com/daveray/seesaw][Seesaw]] and [[https://github.com/mikera/imagez][Imagez]].
+Written in [[http://clojure.org][Clojure]].  Uses [[https://github.com/daveray/seesaw][Seesaw]] and [[https://github.com/mikera/imagez][Imagez]].
 
 ** Usage:
 
