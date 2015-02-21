@@ -29,7 +29,6 @@ then crop (until I implement Save).
 
 ** Work to do:
 
-- Implement XOR grid rather than black grid
 - Implement draggable grid
 - Implement Load/Save functionality
 - Implement drag and drop

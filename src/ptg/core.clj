@@ -11,14 +11,19 @@
 (def default-support-grid-spacing 1)
 
 
+(defn- invert-point [img x y]
+  (let [c (.getRGB img x y)]
+    (.setRGB img x y (bit-not c))))
+
+
 (defn- line-x [img y x0 x1]
   (doseq [x (range x0 x1)]
-    (.setRGB img x y 0)))
+    (invert-point img x y)))
 
 
 (defn- line-y [img x y0 y1]
   (doseq [y (range y0 y1)]
-    (.setRGB img x y 0)))
+    (invert-point img x y)))
 
 
 (defn -main [& [filename _]]
