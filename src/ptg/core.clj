@@ -16,14 +16,22 @@
     (.setRGB img x y (bit-not c))))
 
 
+(defn- in-bounds [img x y]
+  (let [w (.getWidth img)
+        h (.getHeight img)]
+    (and (< 0 x w)
+         (< 0 y h))))
+
+
 (defn- line-x [img y x0 x1]
   (doseq [x (range x0 x1)]
-    (invert-point img x y)))
-
+    (when (in-bounds img x y)
+      (invert-point img x y))))
 
 (defn- line-y [img x y0 y1]
   (doseq [y (range y0 y1)]
-    (invert-point img x y)))
+    (when (in-bounds img x y)
+      (invert-point img x y))))
 
 
 (defn -main [& [filename _]]
@@ -34,6 +42,8 @@
         width-txt (see/text (str default-support-width))
         height-txt (see/text (str default-support-height))
         grid-txt (see/text (str default-support-grid-spacing))
+        offs-x-txt (see/text "0")
+        offs-y-txt (see/text "0")
         lbl (see/label)
 
         input-form
@@ -42,38 +52,50 @@
          [(see/label :text " Support size: ") width-txt
           (see/label :text " inches/cm wide by ") height-txt
           (see/label :text " inches/cm high. Square size: ") grid-txt
-          (see/label :text " inch/cm. ")])
+          (see/label :text " inch/cm. Offset: ") offs-x-txt offs-y-txt])
 
         draw-image-with-lines
         (fn [support-width
              support-height
-             support-grid-spacing]
+             support-grid-spacing
+             offs-x offs-y]
           (let [img (img/load-image filename)
                 {:keys [xlines ylines]}
                 (gridlines support-width support-height support-grid-spacing
                            (.getWidth img) (.getHeight img))
                 contents (see/vertical-panel :items [input-form
                                                      (see/scrollable lbl)])]
-            (doseq [[y x0 x1] xlines] (line-x img y x0 x1))
-            (doseq [[x y0 y1] ylines] (line-y img x y0 y1))
+            (doseq [[y x0 x1] xlines]
+              (line-x img (+ offs-y y) (+ offs-x x0) (+ offs-x x1)))
+            (doseq [[x y0 y1] ylines]
+              (line-y img (+ offs-x x) (+ offs-y y0) (+ offs-y y1)))
             (see/config! f :content contents)
             (see/config! lbl :icon img)
             (see/pack! f)
             (see/show! f)
             (see/request-focus! width-txt)))
 
+        get-field-num #(Double/parseDouble (see/config % :text))
+
         callback
         (fn [e]
           (if (= 10 (.getKeyCode e))
-            (let [width (Double/parseDouble (see/config width-txt :text))
-                  height (Double/parseDouble (see/config height-txt :text))
-                  grid-size (Double/parseDouble (see/config grid-txt :text))]
-              (draw-image-with-lines width height grid-size))))]
+            (let [width (get-field-num width-txt)
+                  height (get-field-num height-txt)
+                  grid-size (get-field-num grid-txt)
+                  offs-x (get-field-num offs-x-txt)
+                  offs-y (get-field-num offs-y-txt)]
+              (draw-image-with-lines width height grid-size offs-x offs-y))))]
 
     (see/config! f :title filename)
     (see/listen width-txt :key-pressed callback)
     (see/listen height-txt :key-pressed callback)
     (see/listen grid-txt :key-pressed callback)
+    (see/listen offs-x-txt :key-pressed callback)
+    (see/listen offs-y-txt :key-pressed callback)
 
     (see/native!)
-    (draw-image-with-lines 12 10 3)))
+    (draw-image-with-lines default-support-width
+                           default-support-height
+                           default-support-grid-spacing
+                           0 0)))
