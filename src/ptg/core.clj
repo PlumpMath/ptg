@@ -28,6 +28,7 @@
     (when (in-bounds img x y)
       (invert-point img x y))))
 
+
 (defn- line-y [img x y0 y1]
   (doseq [y (range y0 y1)]
     (when (in-bounds img x y)
